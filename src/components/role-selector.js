@@ -29,7 +29,7 @@ export default function RoleSelector({ onRoleSelected }) {
       <Box
         sx={{
           p: 4,
-          backgroundColor: '#F5E1C0',
+          backgroundColor: '#EAEAEA',
           borderRadius: 2,
           boxShadow: 3,
           textAlign: 'center',

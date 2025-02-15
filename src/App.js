@@ -9,7 +9,6 @@ import {
   Box
 } from '@mui/material';
 import { Auth } from './components/auth';
-import { Asistencia } from './components/asistencia';
 import { ListaPuntos } from './components/lista-puntos';
 import { supabase } from './config/supabaseClient';
 import RoleSelector from './components/role-selector';
@@ -106,7 +105,6 @@ function App() {
       </AppBar>
       <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
         <ListaPuntos role={role} />
-        <Asistencia role={role} />
       </Container>
     </>
   );
