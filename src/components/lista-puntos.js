@@ -20,12 +20,12 @@ import { supabase } from '../config/supabaseClient';
 export function ListaPuntos({ role }) {
   const [students, setStudents] = useState([]);
   const [newStudentName, setNewStudentName] = useState('');
-  const [newStudentParallel, setNewStudentParallel] = useState(1); // Estado para el paralelo
-  const [filter, setFilter] = useState('global'); // Estado para el filtro (global, paralelo 1, paralelo 2)
+  const [newStudentParallel, setNewStudentParallel] = useState(1);
+  const [filter, setFilter] = useState('global');
 
   useEffect(() => {
     fetchStudents();
-  }, [filter]); // Recargar estudiantes cuando cambie el filtro
+  }, [filter]);
 
   const fetchStudents = async () => {
     let query = supabase
@@ -33,7 +33,6 @@ export function ListaPuntos({ role }) {
       .select('id, name, points, paralelo')
       .order('points', { ascending: false });
 
-    // Aplicar filtro según la selección
     if (filter === 'paralelo1') {
       query = query.eq('paralelo', 1);
     } else if (filter === 'paralelo2') {
@@ -57,7 +56,7 @@ export function ListaPuntos({ role }) {
       .insert([{ 
         name: newStudentName, 
         points: 0, 
-        paralelo: newStudentParallel // Incluir el paralelo
+        paralelo: newStudentParallel
       }])
       .select();
 
@@ -68,7 +67,7 @@ export function ListaPuntos({ role }) {
 
     setStudents([...students, ...data]);
     setNewStudentName('');
-    setNewStudentParallel(1); // Reiniciar el valor del paralelo
+    setNewStudentParallel(1);
   };
 
   const addPoint = async (studentId) => {
@@ -81,7 +80,16 @@ export function ListaPuntos({ role }) {
     }
   };
 
-  // Función para asignar medallas a los 3 primeros
+  const decrementPoint = async (studentId) => {
+    const { error } = await supabase.rpc('decrement_points', { student_id: studentId });
+
+    if (error) {
+      console.error('Error subtracting point:', error);
+    } else {
+      fetchStudents();
+    }
+  };
+
   const getMedal = (index) => {
     const medals = ["🥇", "🥈", "🥉"];
     return index < 3 ? medals[index] : "";
@@ -93,7 +101,6 @@ export function ListaPuntos({ role }) {
         🏆 Ranking
       </Typography>
 
-      {/* Selector de filtro (global, paralelo 1, paralelo 2) */}
       <Box sx={{ mb: 3, textAlign: 'center' }}>
         <FormControl fullWidth>
           <InputLabel>Filtrar por</InputLabel>
@@ -160,7 +167,7 @@ export function ListaPuntos({ role }) {
               borderRadius: 2, 
               boxShadow: 2, 
               transition: "0.3s", 
-              "&:hover": { transform: "scale(1.05)", boxShadow: 4 } // Efecto hover
+              "&:hover": { transform: "scale(1.05)", boxShadow: 4 }
             }}
           >
             <CardContent>
@@ -178,18 +185,32 @@ export function ListaPuntos({ role }) {
                     {student.points} puntos
                   </Typography>
                   {role === 'profesor' && (
-                    <Button 
-                      variant="contained" 
-                      size="small"
-                      sx={{ 
-                        backgroundColor: "#000000", 
-                        color: "white", 
-                        "&:hover": { backgroundColor: "#333333" } 
-                      }}
-                      onClick={() => addPoint(student.id)}
-                    >
-                      +1 Punto
-                    </Button>
+                    <Box sx={{ display: 'flex', gap: 1 }}>
+                      <Button 
+                        variant="contained" 
+                        size="small"
+                        sx={{ 
+                          backgroundColor: "#000000", 
+                          color: "white", 
+                          "&:hover": { backgroundColor: "#333333" } 
+                        }}
+                        onClick={() => addPoint(student.id)}
+                      >
+                        +1 Punto
+                      </Button>
+                      <Button 
+                        variant="contained" 
+                        size="small"
+                        sx={{ 
+                          backgroundColor: "#ff0000", 
+                          color: "white", 
+                          "&:hover": { backgroundColor: "#cc0000" } 
+                        }}
+                        onClick={() => decrementPoint(student.id)}
+                      >
+                        -1 Punto
+                      </Button>
+                    </Box>
                   )}
                 </Box>
               </Box>
