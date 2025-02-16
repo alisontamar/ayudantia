@@ -1,22 +1,18 @@
 import { useState, useEffect } from 'react';
-import { 
-  Button, 
-  List, 
-  ListItemText, 
-  Paper, 
-  Typography,
-  TextField,
-  Box,
-  Card,
-  CardContent,
-  MenuItem,
-  Select,
-  FormControl,
-  InputLabel,
-  Grid
-} from '@mui/material';
-import { supabase } from '../config/supabaseClient';
-
+import Button from '@mui/material/Button';
+import List from '@mui/material/List';
+import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
+import Box from '@mui/material/Box';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import MenuItem from '@mui/material/MenuItem';
+import Select from '@mui/material/Select';
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Grid from '@mui/material/Grid';
+import {supabase} from '../config/supabaseClient';
 export function ListaPuntos({ role }) {
   const [students, setStudents] = useState([]);
   const [newStudentName, setNewStudentName] = useState('');
@@ -38,6 +34,10 @@ export function ListaPuntos({ role }) {
     } else if (filter === 'paralelo2') {
       query = query.eq('paralelo', 2);
     }
+    else if (filter === 'paralelo3') {
+      query = query.eq('paralelo', 3);
+    }
+    
 
     const { data, error } = await query;
 
@@ -112,6 +112,7 @@ export function ListaPuntos({ role }) {
             <MenuItem value="global">Todos</MenuItem>
             <MenuItem value="paralelo1">Paralelo 1</MenuItem>
             <MenuItem value="paralelo2">Paralelo 2</MenuItem>
+            <MenuItem value="paralelo3">Paralelo 3</MenuItem>
           </Select>
         </FormControl>
       </Box>
@@ -138,6 +139,7 @@ export function ListaPuntos({ role }) {
                 >
                   <MenuItem value={1}>1</MenuItem>
                   <MenuItem value={2}>2</MenuItem>
+                  <MenuItem value={3}>3</MenuItem>
                 </Select>
               </FormControl>
             </Grid>

@@ -9,7 +9,7 @@ import {
   Box
 } from '@mui/material';
 import { Auth } from './components/auth';
-import { ListaPuntos } from './components/lista-puntos';
+import  {ListaPuntos}  from './components/lista-puntos';
 import { supabase } from './config/supabaseClient';
 import RoleSelector from './components/role-selector';
 
