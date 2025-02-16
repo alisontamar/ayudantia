@@ -22,6 +22,20 @@ export function ListaPuntos({ role }) {
 
   useEffect(() => {
     fetchStudents();
+
+    // Suscribirse a cambios en la tabla "students"
+    const subscription = supabase
+      .channel('realtime-students')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'students' }, (payload) => {
+        console.log('Cambio detectado en students:', payload);
+        fetchStudents(); // Recargar los datos cuando haya un cambio en la base de datos
+      })
+      .subscribe();
+
+    // Cleanup: Cancelar suscripción cuando el componente se desmonta
+    return () => {
+      supabase.removeChannel(subscription);
+    };
   }, [filter]);
 
   const fetchStudents = async () => {
