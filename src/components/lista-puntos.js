@@ -22,7 +22,6 @@ export function ListaPuntos({ role }) {
 
   useEffect(() => {
     fetchStudents();
-
     // Suscribirse a cambios en la tabla "students"
     const subscription = supabase
       .channel('realtime-students')
@@ -31,7 +30,6 @@ export function ListaPuntos({ role }) {
         fetchStudents(); // Recargar los datos cuando haya un cambio en la base de datos
       })
       .subscribe();
-
     // Cleanup: Cancelar suscripción cuando el componente se desmonta
     return () => {
       supabase.removeChannel(subscription);
@@ -85,21 +83,35 @@ export function ListaPuntos({ role }) {
 
   const addPoint = async (studentId) => {
     const { error } = await supabase.rpc('increment_points', { student_id: studentId });
-
+  
     if (error) {
       console.error('Error adding point:', error);
     } else {
-      fetchStudents();
+      // Actualizar el estado local
+      setStudents((prevStudents) =>
+        prevStudents.map((student) =>
+          student.id === studentId
+            ? { ...student, points: student.points + 1 }
+            : student
+        )
+      );
     }
   };
-
+  
   const decrementPoint = async (studentId) => {
     const { error } = await supabase.rpc('decrement_points', { student_id: studentId });
-
+  
     if (error) {
       console.error('Error subtracting point:', error);
     } else {
-      fetchStudents();
+      // Actualizar el estado local
+      setStudents((prevStudents) =>
+        prevStudents.map((student) =>
+          student.id === studentId
+            ? { ...student, points: student.points - 1 }
+            : student
+        )
+      );
     }
   };
 
@@ -240,5 +252,4 @@ export function ListaPuntos({ role }) {
         )}
       </List>
     </Paper>
-  );
-}
+  );}
