@@ -12,7 +12,8 @@ import Select from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import Grid from '@mui/material/Grid';
-import {supabase} from '../config/supabaseClient';
+import { supabase } from '../config/supabaseClient';
+
 export function ListaPuntos({ role }) {
   const [students, setStudents] = useState([]);
   const [newStudentName, setNewStudentName] = useState('');
@@ -33,11 +34,9 @@ export function ListaPuntos({ role }) {
       query = query.eq('paralelo', 1);
     } else if (filter === 'paralelo2') {
       query = query.eq('paralelo', 2);
-    }
-    else if (filter === 'paralelo3') {
+    } else if (filter === 'paralelo3') {
       query = query.eq('paralelo', 3);
     }
-    
 
     const { data, error } = await query;
 
@@ -90,9 +89,9 @@ export function ListaPuntos({ role }) {
     }
   };
 
-  const getMedal = (index) => {
+  const getMedal = (index, points) => {
     const medals = ["🥇", "🥈", "🥉"];
-    return index < 3 ? medals[index] : "";
+    return points > 0 && index < 3 ? medals[index] : "";
   };
 
   return (
@@ -161,64 +160,70 @@ export function ListaPuntos({ role }) {
       )}
 
       <List sx={{ mt: 2 }}>
-        {students.map((student, index) => (
-          <Card 
-            key={student.id} 
-            sx={{ 
-              mb: 2, 
-              borderRadius: 2, 
-              boxShadow: 2, 
-              transition: "0.3s", 
-              "&:hover": { transform: "scale(1.05)", boxShadow: 4 }
-            }}
-          >
-            <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Box>
-                  <Typography variant="h6">
-                    {getMedal(index)} {student.name}
-                  </Typography>
-                  <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                    Paralelo {student.paralelo}
-                  </Typography>
+        {students.length === 0 ? (
+          <Typography variant="body1" align="center" sx={{ color: 'text.secondary' }}>
+            Aún no hay competidores
+          </Typography>
+        ) : (
+          students.map((student, index) => (
+            <Card 
+              key={student.id} 
+              sx={{ 
+                mb: 2, 
+                borderRadius: 2, 
+                boxShadow: 2, 
+                transition: "0.3s", 
+                "&:hover": { transform: "scale(1.05)", boxShadow: 4 }
+              }}
+            >
+              <CardContent>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Box>
+                    <Typography variant="h6">
+                      {getMedal(index, student.points)} {student.name}
+                    </Typography>
+                    <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+                      Paralelo {student.paralelo}
+                    </Typography>
+                  </Box>
+                  <Box>
+                    <Typography variant="body1" sx={{ color: 'text.secondary' }}>
+                      {student.points} puntos
+                    </Typography>
+                    {role === 'profesor' && (
+                      <Box sx={{ display: 'flex', gap: 1 }}>
+                        <Button 
+                          variant="contained" 
+                          size="small"
+                          sx={{ 
+                            backgroundColor: "#000000", 
+                            color: "white", 
+                            "&:hover": { backgroundColor: "#333333" } 
+                          }}
+                          onClick={() => addPoint(student.id)}
+                        >
+                          +1 Punto
+                        </Button>
+                        <Button 
+                          variant="contained" 
+                          size="small"
+                          sx={{ 
+                            backgroundColor: "#ff0000", 
+                            color: "white", 
+                            "&:hover": { backgroundColor: "#cc0000" } 
+                          }}
+                          onClick={() => decrementPoint(student.id)}
+                        >
+                          -1 Punto
+                        </Button>
+                      </Box>
+                    )}
+                  </Box>
                 </Box>
-                <Box>
-                  <Typography variant="body1" sx={{ color: 'text.secondary' }}>
-                    {student.points} puntos
-                  </Typography>
-                  {role === 'profesor' && (
-                    <Box sx={{ display: 'flex', gap: 1 }}>
-                      <Button 
-                        variant="contained" 
-                        size="small"
-                        sx={{ 
-                          backgroundColor: "#000000", 
-                          color: "white", 
-                          "&:hover": { backgroundColor: "#333333" } 
-                        }}
-                        onClick={() => addPoint(student.id)}
-                      >
-                        +1 Punto
-                      </Button>
-                      <Button 
-                        variant="contained" 
-                        size="small"
-                        sx={{ 
-                          backgroundColor: "#ff0000", 
-                          color: "white", 
-                          "&:hover": { backgroundColor: "#cc0000" } 
-                        }}
-                        onClick={() => decrementPoint(student.id)}
-                      >
-                        -1 Punto
-                      </Button>
-                    </Box>
-                  )}
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        ))}
+              </CardContent>
+            </Card>
+          ))
+        )}
       </List>
     </Paper>
   );
