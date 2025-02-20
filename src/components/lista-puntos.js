@@ -21,8 +21,20 @@ export function ListaPuntos({ role }) {
   const [filter, setFilter] = useState('global');
 
   useEffect(() => {
-    fetchStudents();
-  }, [filter]);
+    fetchStudents(); // Cargar la lista inicialmente
+  
+    const subscription = supabase
+      .channel('students-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'students' }, () => {
+        fetchStudents(); // Refrescar la lista cuando haya cambios en la tabla
+      })
+      .subscribe();
+  
+    return () => {
+      supabase.removeChannel(subscription); // Eliminar la suscripción cuando el componente se desmonte
+    };
+  }, [filter]); // Se ejecuta cuando cambia el filtro
+  
 
   const fetchStudents = async () => {
     let query = supabase
